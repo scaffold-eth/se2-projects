@@ -165,54 +165,55 @@ async function main() {
       const res = await headWithRetry(repo.url);
       const status = res.status;
 
-      const isOnline = status >= 200 && status < 400; // treat 2xx/3xx as online
       const isNotFound = status === 404;
 
-      if (isNotFound && repo.deleted_at === null) {
-        await updateDeletedAt(repo.id, "now");
-        markedDeleted++;
-        console.log(`${progress} Marked deleted: ${repo.full_name} (status ${status})`);
-      } else if (isOnline) {
-        // Repository is online - check if it still uses Scaffold-ETH 2
-        if (repo.deleted_at !== null) {
-          // Repository was previously marked as deleted but is now online
-          await updateDeletedAt(repo.id, null);
-          restored++;
-          console.log(`${progress} Restored: ${repo.full_name} (status ${status})`);
+      if (isNotFound) {
+        if (repo.deleted_at === null) {
+          await updateDeletedAt(repo.id, "now");
+          markedDeleted++;
+          console.log(`${progress} Marked deleted: ${repo.full_name} (status ${status})`);
         } else {
-          // Check if scaffold.config.ts exists
-          // Use "main" as fallback if default_branch is null
-          const branch = repo.default_branch || "main";
-          const tree = await fetchGitTreeWithRetry(repo.full_name, branch);
-
-          if (tree === null) {
-            // Failed to fetch tree - skip for now
-            unchanged++;
-            if (i % 50 === 0) {
-              console.log(`${progress} Unchanged: ${repo.full_name} (status ${status}, tree fetch failed)`);
-            }
-          } else if (!tree.truncated && !hasScaffoldConfig(tree)) {
-            // scaffold.config.ts not found and tree is not truncated
-            await updateDeletedAt(repo.id, "now");
-            markedDeleted++;
-            deletedNoScaffoldConfig++;
-            console.log(
-              `${progress} Marked deleted (no scaffold.config.ts): ${repo.full_name} (status ${status})`
-            );
-          } else {
-            unchanged++;
-            if (i % 50 === 0) {
-              console.log(`${progress} Unchanged: ${repo.full_name} (status ${status})`);
-            }
+          unchanged++;
+          if (i % 50 === 0) {
+            console.log(`${progress} Unchanged: ${repo.full_name} (status ${status})`);
           }
-
-          // Additional delay after git tree API call
-          await delay(150);
         }
       } else {
-        unchanged++;
-        if (i % 50 === 0) {
-          console.log(`${progress} Unchanged: ${repo.full_name} (status ${status})`);
+        // Repository is online - check if it still uses Scaffold-ETH 2
+        const branch = repo.default_branch || "main";
+        const tree = await fetchGitTreeWithRetry(repo.full_name, branch);
+
+        if (tree === null || tree.truncated) {
+          // Failed to fetch tree or tree is truncated - skip for now
+          unchanged++;
+          if (i % 50 === 0) {
+            console.log(`${progress} Unchanged: ${repo.full_name} (status ${status}, tree fetch failed)`);
+          }
+        } else {
+          if (hasScaffoldConfig(tree)) {
+            if (repo.deleted_at !== null) {
+              await updateDeletedAt(repo.id, null);
+              restored++;
+              console.log(`${progress} Restored: ${repo.full_name} (status ${status})`);
+            } else {
+              unchanged++;
+              if (i % 50 === 0) {
+                console.log(`${progress} Unchanged: ${repo.full_name} (status ${status})`);
+              }
+            }
+          } else {
+            if (repo.deleted_at === null) {
+              await updateDeletedAt(repo.id, "now");
+              markedDeleted++;
+              deletedNoScaffoldConfig++;
+              console.log(`${progress} Marked deleted because no scaffold.config.ts: ${repo.full_name} (status ${status})`);
+            } else {
+              unchanged++;
+              if (i % 50 === 0) {
+                console.log(`${progress} Unchanged: ${repo.full_name} (status ${status})`);
+              }
+            }
+          }
         }
       }
 
