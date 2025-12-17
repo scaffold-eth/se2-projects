@@ -175,7 +175,7 @@ async function main() {
         } else {
           unchanged++;
           if (i % 50 === 0) {
-            console.log(`${progress} Unchanged: ${repo.full_name} (status ${status}, tree fetch failed)`);
+            console.log(`${progress} Unchanged: ${repo.full_name} (status ${status})`);
           }
         }
       } else {
