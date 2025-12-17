@@ -202,7 +202,7 @@ async function main() {
               }
             }
           } else {
-            if (repo.deleted_at !== null) {
+            if (repo.deleted_at === null) {
               await updateDeletedAt(repo.id, "now");
               markedDeleted++;
               deletedNoScaffoldConfig++;
