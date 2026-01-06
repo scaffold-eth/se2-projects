@@ -1,11 +1,77 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
+import { Repository, mockRepositories } from "~~/lib/mockData";
 
-const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
-});
+const pool = process.env.POSTGRES_URL
+  ? new Pool({
+      connectionString: process.env.POSTGRES_URL,
+    })
+  : null;
+
+function getMockResponse(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get("page") || "1");
+  const limit = parseInt(searchParams.get("limit") || "30");
+  const sortBy = searchParams.get("sortBy") || "id";
+  const sortOrder = searchParams.get("sortOrder") || "desc";
+  const search = searchParams.get("search") || "";
+
+  const offset = (page - 1) * limit;
+
+  const allowedSortFields = ["id", "stars", "forks", "name", "owner", "created_at", "updated_at", "last_seen"];
+  const validSortBy = allowedSortFields.includes(sortBy) ? sortBy : "id";
+  const validSortOrder = sortOrder.toLowerCase() === "asc" ? "asc" : "desc";
+
+  let filtered = [...mockRepositories];
+
+  if (search) {
+    const searchLower = search.toLowerCase();
+    filtered = filtered.filter(
+      r =>
+        r.full_name.toLowerCase().includes(searchLower) ||
+        r.name.toLowerCase().includes(searchLower) ||
+        r.owner.toLowerCase().includes(searchLower),
+    );
+  }
+
+  filtered.sort((a, b) => {
+    const aVal = a[validSortBy as keyof Repository];
+    const bVal = b[validSortBy as keyof Repository];
+    if (typeof aVal === "number" && typeof bVal === "number") {
+      return validSortOrder === "asc" ? aVal - bVal : bVal - aVal;
+    }
+    const aStr = String(aVal || "");
+    const bStr = String(bVal || "");
+    return validSortOrder === "asc" ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+  });
+
+  const totalCount = filtered.length;
+  const totalPages = Math.ceil(totalCount / limit);
+  const repositories = filtered.slice(offset, offset + limit);
+
+  return NextResponse.json({
+    repositories,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalCount,
+      limit,
+      hasNext: page < totalPages,
+      hasPrev: page > 1,
+    },
+    sorting: {
+      sortBy: validSortBy,
+      sortOrder: validSortOrder,
+    },
+    search,
+  });
+}
 
 export async function GET(request: NextRequest) {
+  if (!pool) {
+    return getMockResponse(request);
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");

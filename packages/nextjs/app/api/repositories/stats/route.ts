@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
+import { getMockStats } from "~~/lib/mockData";
 
-const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
-});
+const pool = process.env.POSTGRES_URL
+  ? new Pool({
+      connectionString: process.env.POSTGRES_URL,
+    })
+  : null;
 
 export async function GET() {
+  if (!pool) {
+    return NextResponse.json(getMockStats());
+  }
+
   try {
     const client = await pool.connect();
 

@@ -1,11 +1,66 @@
 import { NextResponse } from "next/server";
 import { Pool } from "pg";
+import { Repository, mockRepositories } from "~~/lib/mockData";
 
-const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
-});
+const pool = process.env.POSTGRES_URL
+  ? new Pool({
+      connectionString: process.env.POSTGRES_URL,
+    })
+  : null;
+
+function generateCsv(repositories: Repository[]) {
+  const headers = [
+    "ID",
+    "Full Name",
+    "Name",
+    "Owner",
+    "URL",
+    "Homepage",
+    "Stars",
+    "Forks",
+    "Created At",
+    "Updated At",
+    "Last Seen",
+    "Saved At",
+    "Source",
+  ];
+
+  const csvRows = [
+    headers.join(","),
+    ...repositories.map(repo => {
+      return [
+        repo.id,
+        `"${repo.full_name}"`,
+        `"${repo.name}"`,
+        `"${repo.owner}"`,
+        `"${repo.url}"`,
+        repo.homepage ? `"${repo.homepage}"` : "",
+        repo.stars || 0,
+        repo.forks || 0,
+        repo.created_at || "",
+        repo.updated_at || "",
+        repo.last_seen || "",
+        repo.saved_at || "",
+        `"${(repo.source || []).join("; ")}"`,
+      ].join(",");
+    }),
+  ];
+
+  return csvRows.join("\n");
+}
 
 export async function GET() {
+  if (!pool) {
+    const csvContent = generateCsv(mockRepositories);
+    return new NextResponse(csvContent, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/csv",
+        "Content-Disposition": `attachment; filename="repositories-${new Date().toISOString().split("T")[0]}.csv"`,
+      },
+    });
+  }
+
   let client;
 
   try {
@@ -22,47 +77,7 @@ export async function GET() {
     `);
 
     const repositories = result.rows;
-
-    // Convert to CSV format
-    const headers = [
-      "ID",
-      "Full Name",
-      "Name",
-      "Owner",
-      "URL",
-      "Homepage",
-      "Stars",
-      "Forks",
-      "Created At",
-      "Updated At",
-      "Last Seen",
-      "Saved At",
-      "Source",
-    ];
-
-    // Create CSV content
-    const csvRows = [
-      headers.join(","),
-      ...repositories.map(repo => {
-        return [
-          repo.id,
-          `"${repo.full_name}"`,
-          `"${repo.name}"`,
-          `"${repo.owner}"`,
-          `"${repo.url}"`,
-          repo.homepage ? `"${repo.homepage}"` : "",
-          repo.stars || 0,
-          repo.forks || 0,
-          repo.created_at || "",
-          repo.updated_at || "",
-          repo.last_seen || "",
-          repo.saved_at || "",
-          `"${(repo.source || []).join("; ")}"`,
-        ].join(",");
-      }),
-    ];
-
-    const csvContent = csvRows.join("\n");
+    const csvContent = generateCsv(repositories);
 
     // Return CSV file
     return new NextResponse(csvContent, {

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import type { NextPage } from "next";
-import { BugAntIcon, ChartBarIcon, CodeBracketIcon, MagnifyingGlassIcon, StarIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { RepositoryStats } from "~~/types/repository";
 
 const Home: NextPage = () => {
@@ -31,159 +32,123 @@ const Home: NextPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="loading loading-spinner loading-lg"></div>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="loading loading-spinner loading-lg text-base-content/30"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="alert alert-error max-w-md">
-          <span>Error loading repository statistics: {error}</span>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <p className="text-error mb-2">Failed to load data</p>
+          <p className="text-sm text-base-content/50">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <>
-      <div className="flex items-center flex-col grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Projects using</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-        </div>
-
-        {stats && (
-          <div className="w-full max-w-6xl px-4 py-8">
-            {/* Overview Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="stat bg-base-100 rounded-lg shadow">
-                <div className="stat-figure text-primary">
-                  <CodeBracketIcon className="h-8 w-8" />
-                </div>
-                <div className="stat-title text-base-content/70">Total Repositories</div>
-                <div className="stat-value text-base-content font-bold">{stats.totalRepos.toLocaleString()}</div>
-              </div>
-
-              <div className="stat bg-base-100 rounded-lg shadow">
-                <div className="stat-figure text-primary">
-                  <StarIcon className="h-8 w-8" />
-                </div>
-                <div className="stat-title text-base-content/70">Total Stars</div>
-                <div className="stat-value text-base-content font-bold">{stats.totals.totalStars.toLocaleString()}</div>
-              </div>
-
-              <div className="stat bg-base-100 rounded-lg shadow">
-                <div className="stat-figure text-primary">
-                  <ChartBarIcon className="h-8 w-8" />
-                </div>
-                <div className="stat-title text-base-content/70">Total Forks</div>
-                <div className="stat-value text-base-content font-bold">{stats.totals.totalForks.toLocaleString()}</div>
-              </div>
-
-              <div className="stat bg-base-100 rounded-lg shadow">
-                <div className="stat-figure text-primary">
-                  <BugAntIcon className="h-8 w-8" />
-                </div>
-                <div className="stat-title text-base-content/70">Recent (7 days)</div>
-                <div className="stat-value text-base-content font-bold">{stats.recentRepos.toLocaleString()}</div>
-              </div>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+      {stats && (
+        <>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+            <div className="bg-base-200/50 rounded-xl p-5">
+              <div className="text-sm font-medium text-base-content/50 mb-1">Repositories</div>
+              <div className="text-2xl sm:text-3xl font-bold font-mono">{stats.totalRepos.toLocaleString()}</div>
             </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Top Repositories by Stars */}
-              <div className="card bg-base-100 shadow-xl">
-                <div className="card-body">
-                  <h2 className="card-title">
-                    <StarIcon className="h-6 w-6" />
-                    Top Repositories by Stars
-                  </h2>
-                  <div className="overflow-x-auto">
-                    <table className="table table-zebra w-full">
-                      <thead>
-                        <tr>
-                          <th>Repository</th>
-                          <th>Stars</th>
-                          <th>Forks</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {stats.topStars.map((repo, index) => (
-                          <tr key={repo.full_name} className="h-16">
-                            <td className="py-2">
-                              <div className="flex items-center space-x-3">
-                                <div className="font-bold text-base-content/60">{index + 1}</div>
-                                <div>
-                                  <div className="font-bold text-base-content">{repo.name}</div>
-                                  <div className="text-sm text-base-content/60">{repo.owner}</div>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <span className="font-semibold text-base-content">{repo.stars.toLocaleString()}</span>
-                            </td>
-                            <td>
-                              <span className="font-semibold text-base-content">{repo.forks.toLocaleString()}</span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              {/* Top Owners (moved here) */}
-              <div className="card bg-base-100 shadow-xl">
-                <div className="card-body">
-                  <h2 className="card-title">
-                    <MagnifyingGlassIcon className="h-6 w-6" />
-                    Top Repository Owners
-                  </h2>
-                  <div className="overflow-x-auto">
-                    <table className="table table-zebra w-full">
-                      <thead>
-                        <tr>
-                          <th>Owner</th>
-                          <th>Repositories</th>
-                          <th>Total Stars</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {stats.topOwners.map((owner, index) => (
-                          <tr key={owner.owner} className="h-16">
-                            <td>
-                              <div className="flex items-center space-x-3">
-                                <div className="font-bold text-base-content/60">{index + 1}</div>
-                                <div className="font-bold text-base-content">{owner.owner}</div>
-                              </div>
-                            </td>
-                            <td>
-                              <span className="font-semibold text-base-content">
-                                {owner.repo_count.toLocaleString()}
-                              </span>
-                            </td>
-                            <td>
-                              <span className="font-semibold text-base-content">
-                                {parseInt(owner.total_stars.toString()).toLocaleString()}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+            <div className="bg-base-200/50 rounded-xl p-5">
+              <div className="text-sm font-medium text-base-content/50 mb-1">Total Stars</div>
+              <div className="text-2xl sm:text-3xl font-bold font-mono">{stats.totals.totalStars.toLocaleString()}</div>
+            </div>
+            <div className="bg-base-200/50 rounded-xl p-5">
+              <div className="text-sm font-medium text-base-content/50 mb-1">Total Forks</div>
+              <div className="text-2xl sm:text-3xl font-bold font-mono">{stats.totals.totalForks.toLocaleString()}</div>
+            </div>
+            <div className="bg-base-200/50 rounded-xl p-5">
+              <div className="text-sm font-medium text-base-content/50 mb-1">New This Week</div>
+              <div className="text-2xl sm:text-3xl font-bold font-mono">{stats.recentRepos.toLocaleString()}</div>
             </div>
           </div>
-        )}
-      </div>
-    </>
+
+          {/* Two Column Layout */}
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Top Repositories */}
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Top Repositories</h2>
+                <Link
+                  href="/repositories"
+                  className="text-sm text-base-content/50 hover:text-base-content flex items-center gap-1 transition-colors"
+                >
+                  View all <ArrowRightIcon className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="space-y-2">
+                {stats.topStars.slice(0, 8).map((repo, index) => (
+                  <a
+                    key={repo.full_name}
+                    href={`https://github.com/${repo.full_name}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-base-200/70 transition-colors group"
+                  >
+                    <span className="text-base-content/30 font-mono text-sm w-5 text-right">{index + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate group-hover:text-accent transition-colors">{repo.name}</div>
+                      <div className="text-sm text-base-content/50 truncate">{repo.owner}</div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-mono font-medium">{repo.stars.toLocaleString()}</div>
+                      <div className="text-xs text-base-content/40">stars</div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </section>
+
+            {/* Top Contributors */}
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Top Contributors</h2>
+              </div>
+              <div className="space-y-2">
+                {stats.topOwners.slice(0, 8).map((owner, index) => (
+                  <a
+                    key={owner.owner}
+                    href={`https://github.com/${owner.owner}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-base-200/70 transition-colors group"
+                  >
+                    <span className="text-base-content/30 font-mono text-sm w-5 text-right">{index + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate group-hover:text-accent transition-colors">
+                        {owner.owner}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6 text-right shrink-0">
+                      <div>
+                        <div className="font-mono font-medium">{owner.repo_count}</div>
+                        <div className="text-xs text-base-content/40">repos</div>
+                      </div>
+                      <div>
+                        <div className="font-mono font-medium">
+                          {parseInt(owner.total_stars.toString()).toLocaleString()}
+                        </div>
+                        <div className="text-xs text-base-content/40">stars</div>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </section>
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 
