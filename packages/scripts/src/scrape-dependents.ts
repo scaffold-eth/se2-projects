@@ -12,6 +12,7 @@ import {
   setupGracefulShutdown,
   type RepositoryData,
 } from "./common";
+import { notifyTelegramOnError } from "./telegram-error-notify";
 
 const BASE_URL =
   "https://github.com/scaffold-eth/burner-connector/network/dependents?dependent_type=REPOSITORY";
@@ -157,4 +158,9 @@ const BASE_URL =
 
   await pool.end();
   await browser.close();
-})();
+})().catch((err) => {
+  console.error("Unhandled error:", err);
+  notifyTelegramOnError("scrape-dependents", err).finally(() => {
+    process.exit(1);
+  });
+});

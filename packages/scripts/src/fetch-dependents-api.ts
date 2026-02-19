@@ -20,6 +20,7 @@ import {
   type RepositoryData,
   type GitHubRepoResponse,
 } from "./common";
+import { notifyTelegramOnError } from "./telegram-error-notify";
 
 dotenv.config();
 
@@ -167,5 +168,7 @@ async function main() {
 
 main().catch((err) => {
   console.error("Unhandled error:", err);
-  process.exit(1);
+  notifyTelegramOnError("fetch-dependents-api", err).finally(() => {
+    process.exit(1);
+  });
 });
