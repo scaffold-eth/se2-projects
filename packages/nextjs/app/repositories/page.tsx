@@ -7,6 +7,7 @@ import {
   ChevronUpIcon,
   GlobeAltIcon,
   MagnifyingGlassIcon,
+  StarIcon,
 } from "@heroicons/react/24/outline";
 import { Repository } from "~~/types/repository";
 
@@ -276,10 +277,13 @@ const RepositoriesPage = () => {
                       <div className="font-medium text-base-content">{repo.owner}</div>
                     </td>
                     <td className="border-r border-base-300/50 last:border-r-0">
-                      <div className="font-semibold text-base-content">{repo.stars.toLocaleString()}</div>
+                      <div className="flex items-center gap-1 font-semibold text-warning">
+                        <StarIcon className="h-3.5 w-3.5 shrink-0" />
+                        {repo.stars.toLocaleString()}
+                      </div>
                     </td>
                     <td className="border-r border-base-300/50 last:border-r-0">
-                      <div className="font-semibold text-base-content">{repo.forks.toLocaleString()}</div>
+                      <div className="font-semibold text-base-content/70">{repo.forks.toLocaleString()}</div>
                     </td>
                     <td className="border-r border-base-300/50 last:border-r-0">
                       <div className="text-sm text-base-content">{new Date(repo.created_at).toLocaleDateString()}</div>
@@ -309,16 +313,26 @@ const RepositoriesPage = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center mt-8">
-        <div className="btn-group">
-          <button className="btn" onClick={() => setCurrentPage(1)} disabled={!data.pagination.hasPrev}>
+      <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
+        <div className="text-sm text-base-content/50">
+          Page {data.pagination.currentPage} of {data.pagination.totalPages}
+        </div>
+        <div className="join">
+          <button
+            className="join-item btn btn-sm"
+            onClick={() => setCurrentPage(1)}
+            disabled={!data.pagination.hasPrev}
+          >
             ««
           </button>
-          <button className="btn" onClick={() => setCurrentPage(currentPage - 1)} disabled={!data.pagination.hasPrev}>
+          <button
+            className="join-item btn btn-sm"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={!data.pagination.hasPrev}
+          >
             «
           </button>
 
-          {/* Page numbers */}
           {Array.from({ length: Math.min(5, data.pagination.totalPages) }, (_, i) => {
             const startPage = Math.max(1, data.pagination.currentPage - 2);
             const pageNum = startPage + i;
@@ -328,7 +342,7 @@ const RepositoriesPage = () => {
             return (
               <button
                 key={pageNum}
-                className={`btn ${pageNum === data.pagination.currentPage ? "btn-active" : ""}`}
+                className={`join-item btn btn-sm ${pageNum === data.pagination.currentPage ? "btn-active" : ""}`}
                 onClick={() => setCurrentPage(pageNum)}
               >
                 {pageNum}
@@ -336,11 +350,15 @@ const RepositoriesPage = () => {
             );
           })}
 
-          <button className="btn" onClick={() => setCurrentPage(currentPage + 1)} disabled={!data.pagination.hasNext}>
+          <button
+            className="join-item btn btn-sm"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={!data.pagination.hasNext}
+          >
             »
           </button>
           <button
-            className="btn"
+            className="join-item btn btn-sm"
             onClick={() => setCurrentPage(data.pagination.totalPages)}
             disabled={!data.pagination.hasNext}
           >
