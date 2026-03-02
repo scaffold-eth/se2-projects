@@ -16,6 +16,7 @@
 
 import dotenv from "dotenv";
 import { pool, delay, setupGracefulShutdown, githubHeaders } from "./common";
+import { notifyTelegramOnError } from "./telegram-error-notify";
 
 dotenv.config();
 
@@ -237,9 +238,11 @@ async function main() {
   await pool.end();
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error("Unhandled error:", err);
-  process.exit(1);
+  notifyTelegramOnError("check-repo-online", err).finally(() => {
+    process.exit(1);
+  });
 });
 
 

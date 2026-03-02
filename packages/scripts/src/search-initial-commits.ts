@@ -19,6 +19,7 @@ import {
   setupGracefulShutdown,
   type RepositoryData,
 } from "./common";
+import { notifyTelegramOnError } from "./telegram-error-notify";
 
 dotenv.config();
 
@@ -168,6 +169,8 @@ async function main() {
 
 main().catch((err) => {
   console.error("Unhandled error:", err);
-  process.exit(1);
+  notifyTelegramOnError("search-initial-commits", err).finally(() => {
+    process.exit(1);
+  });
 });
 
