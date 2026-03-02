@@ -125,7 +125,7 @@ const Home: NextPage = () => {
                 </div>
                 <div className="stat-title text-base-content/70">Recent (7 days)</div>
                 <div className="stat-value text-base-content">{stats.recentRepos.toLocaleString()}</div>
-                <div className="stat-desc text-success">new repositories</div>
+                <div className="stat-desc text-base-content/50">new repositories</div>
               </div>
             </div>
 
@@ -157,8 +157,8 @@ const Home: NextPage = () => {
                           <div className="text-xs text-base-content/50 truncate">{repo.owner}</div>
                         </div>
                         <div className="flex items-center gap-3 shrink-0 text-sm">
-                          <span className="flex items-center gap-1 text-warning font-medium">
-                            <StarIcon className="h-3.5 w-3.5" />
+                          <span className="flex items-center gap-1 text-base-content font-medium">
+                            <StarIcon className="h-3.5 w-3.5 text-warning" />
                             {repo.stars.toLocaleString()}
                           </span>
                           <span className="text-base-content/40 hidden sm:inline">
@@ -198,8 +198,8 @@ const Home: NextPage = () => {
                         </div>
                         <div className="flex items-center gap-3 shrink-0 text-sm">
                           <span className="text-base-content/50">{owner.repo_count} repos</span>
-                          <span className="flex items-center gap-1 text-warning font-medium">
-                            <StarIcon className="h-3.5 w-3.5" />
+                          <span className="flex items-center gap-1 text-base-content font-medium">
+                            <StarIcon className="h-3.5 w-3.5 text-warning" />
                             {parseInt(owner.total_stars.toString()).toLocaleString()}
                           </span>
                         </div>

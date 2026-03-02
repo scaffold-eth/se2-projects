@@ -277,8 +277,8 @@ const RepositoriesPage = () => {
                       <div className="font-medium text-base-content">{repo.owner}</div>
                     </td>
                     <td className="border-r border-base-300/50 last:border-r-0">
-                      <div className="flex items-center gap-1 font-semibold text-warning">
-                        <StarIcon className="h-3.5 w-3.5 shrink-0" />
+                      <div className="flex items-center gap-1 font-semibold text-base-content">
+                        <StarIcon className="h-3.5 w-3.5 shrink-0 text-warning" />
                         {repo.stars.toLocaleString()}
                       </div>
                     </td>
