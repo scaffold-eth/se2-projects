@@ -149,7 +149,7 @@ const Home: NextPage = () => {
                             href={repo.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-semibold text-base-content hover:text-primary transition-colors flex items-center gap-1"
+                            className="font-semibold text-base-content hover:opacity-75 transition-opacity flex items-center gap-1"
                           >
                             <span className="truncate">{repo.name}</span>
                             <ArrowTopRightOnSquareIcon className="h-3 w-3 shrink-0 opacity-40" />
@@ -190,7 +190,7 @@ const Home: NextPage = () => {
                             href={`https://github.com/${owner.owner}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-semibold text-base-content hover:text-primary transition-colors flex items-center gap-1"
+                            className="font-semibold text-base-content hover:opacity-75 transition-opacity flex items-center gap-1"
                           >
                             <span className="truncate">{owner.owner}</span>
                             <ArrowTopRightOnSquareIcon className="h-3 w-3 shrink-0 opacity-40" />

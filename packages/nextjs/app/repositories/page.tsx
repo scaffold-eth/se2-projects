@@ -260,7 +260,7 @@ const RepositoriesPage = () => {
                               href={repo.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="link text-base-content hover:text-primary flex items-center space-x-1 transition-colors"
+                              className="link text-base-content flex items-center space-x-1"
                               title={`View ${repo.full_name} on GitHub`}
                             >
                               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
