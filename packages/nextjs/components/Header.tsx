@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CodeBracketIcon } from "@heroicons/react/24/outline";
+import { SwitchTheme } from "~~/components/SwitchTheme";
 
 type HeaderMenuLink = {
   label: string;
@@ -62,13 +63,16 @@ export const Header = () => {
             <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
           </div>
           <div className="flex flex-col">
-            <span className="text-xs">Projects using</span>
+            <span className="text-xs text-base-content/60">Projects using</span>
             <span className="font-bold leading-tight">Scaffold-ETH 2</span>
           </div>
         </Link>
         <ul className="lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
           <HeaderMenuLinks />
         </ul>
+      </div>
+      <div className="navbar-end mr-4">
+        <SwitchTheme />
       </div>
     </div>
   );
