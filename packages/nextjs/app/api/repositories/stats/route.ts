@@ -48,7 +48,7 @@ export async function GET() {
         FROM repositories
         WHERE deleted_at IS NULL AND created_at >= NOW() - INTERVAL '7 days'
       `);
-      const recentRepos = parseInt(recentReposResult.rows[0].count);
+      const createdLast7Days = parseInt(recentReposResult.rows[0].count);
 
       // Get repositories saved in last 7 days
       const recentSavedReposResult = await client.query(`
@@ -56,7 +56,15 @@ export async function GET() {
         FROM repositories
         WHERE deleted_at IS NULL AND saved_at >= NOW() - INTERVAL '7 days'
       `);
-      const recentSavedRepos = parseInt(recentSavedReposResult.rows[0].count);
+      const savedLast7Days = parseInt(recentSavedReposResult.rows[0].count);
+
+      // Get repositories saved in last 30 days
+      const recentSavedReposResult30 = await client.query(`
+        SELECT COUNT(*) as count
+        FROM repositories
+        WHERE deleted_at IS NULL AND saved_at >= NOW() - INTERVAL '30 days'
+      `);
+      const savedLast30Days = parseInt(recentSavedReposResult30.rows[0].count);
 
       // Get daily saved counts for last 30 days
       const savedByDateResult = await client.query(`
@@ -111,8 +119,9 @@ export async function GET() {
         deletedRepos,
         sourceStats,
         topStars,
-        recentRepos,
-        recentSavedRepos,
+        createdLast7Days,
+        savedLast7Days,
+        savedLast30Days,
         savedByDate,
         deletedByDate,
         totals: {

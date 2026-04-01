@@ -119,8 +119,8 @@ const Home: NextPage = () => {
                 <div className="stat-figure text-success">
                   <ClockIcon className="h-8 w-8" />
                 </div>
-                <div className="stat-title text-base-content/70">Recent (7 days)</div>
-                <div className="stat-value text-base-content">{stats.recentRepos.toLocaleString()}</div>
+                <div className="stat-title text-base-content/70">Recent (30 days)</div>
+                <div className="stat-value text-base-content">{stats.savedLast30Days.toLocaleString()}</div>
                 <div className="stat-desc text-base-content/50">new repositories</div>
               </div>
             </div>
