@@ -29,7 +29,9 @@ export interface RepositoryStats {
     url: string;
     source: string[];
   }>;
-  recentRepos: number;
+  createdLast7Days: number;
+  savedLast7Days: number;
+  savedLast30Days: number;
   totals: {
     totalStars: number;
     totalForks: number;
