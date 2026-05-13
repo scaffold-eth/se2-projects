@@ -11,7 +11,8 @@
     "import-csv": "tsx src/import-se2builds-csv.ts",
     "search-initial-commits": "tsx src/search-initial-commits.ts",
     "check-repo-online": "tsx src/check-repo-online.ts",
-    "update-default-branch": "tsx src/update-default-branch.ts"
+    "update-default-branch": "tsx src/update-default-branch.ts",
+    "report-stats-telegram": "tsx src/report-stats-telegram.ts"
   },
   "kenwords": [],
   "author": "",

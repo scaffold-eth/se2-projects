@@ -1,43 +1,39 @@
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-export async function notifyTelegramOnError(
-  scriptName: string,
-  err: unknown
+export async function sendTelegramMessage(
+  text: string,
+  opts?: { parseMode?: "Markdown" | "HTML" }
 ): Promise<void> {
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
     console.warn(
-      "Telegram notification skipped: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set."
+      "Telegram message skipped: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set."
     );
     return;
   }
 
-  const errorText =
-    err instanceof Error
-      ? `${err.name}: ${err.message}\n${err.stack || ""}`
-      : JSON.stringify(err, null, 2);
-
-  const text = [`[${scriptName}] Unhandled error occurred:`, "", errorText].join(
-    "\n"
-  );
-
   try {
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const body: Record<string, unknown> = {
+      chat_id: TELEGRAM_CHAT_ID,
+      text,
+    };
+    if (opts?.parseMode) {
+      body.parse_mode = opts.parseMode;
+    }
+
     const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) {
       const errorText = await res.text();
       console.error(
-        `Failed to send Telegram error notification: ${res.status} ${res.statusText}`,
+        `Failed to send Telegram message: ${res.status} ${res.statusText}`,
         errorText
       );
       return;
@@ -50,7 +46,23 @@ export async function notifyTelegramOnError(
         result
       );
     }
-  } catch (notifyErr) {
-    console.error("Failed to send Telegram error notification:", notifyErr);
+  } catch (sendErr) {
+    console.error("Failed to send Telegram message:", sendErr);
   }
+}
+
+export async function notifyTelegramOnError(
+  scriptName: string,
+  err: unknown
+): Promise<void> {
+  const errorText =
+    err instanceof Error
+      ? `${err.name}: ${err.message}\n${err.stack || ""}`
+      : JSON.stringify(err, null, 2);
+
+  const text = [`[${scriptName}] Unhandled error occurred:`, "", errorText].join(
+    "\n"
+  );
+
+  await sendTelegramMessage(text);
 }
