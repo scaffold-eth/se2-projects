@@ -27,7 +27,8 @@
     "scripts:import-csv": "yarn workspace @se-2/scripts import-csv",
     "scripts:search-initial-commits": "yarn workspace @se-2/scripts search-initial-commits",
     "scripts:check-repo-online": "yarn workspace @se-2/scripts check-repo-online",
-    "scripts:update-default-branch": "yarn workspace @se-2/scripts update-default-branch"
+    "scripts:update-default-branch": "yarn workspace @se-2/scripts update-default-branch",
+    "scripts:report-stats-telegram": "yarn workspace @se-2/scripts report-stats-telegram"
   },
   "packageManager": "yarn@3.2.3",
   "devDependencies": {
